@@ -52,6 +52,24 @@ func runDockerd() (func() error, *client.Client, error) {
 		return nil, nil, err
 	}
 
+        // Launch `buildkitd`
+        buildkitd := exec.Command("buildkitd")
+        buildkitd.Stdout = os.Stderr
+        buildkitd.Stderr = os.Stderr
+ 
+        if err := buildkitd.Start(); err != nil {
+                return nil, nil, errors.Wrap(err, "could not start buildkitd")
+        }
+ 
+        // Setup remote
+        buildx := exec.Command("docker", "buildx", "create", "--driver", "remote", "tcp://localhost:9999", "--name", "fly-builder")
+        buildx.Stdout = os.Stderr
+        buildx.Stderr = os.Stderr
+        if err := buildx.Run(); err != nil {
+                log.Warnln("Error bootstrapping buildx builder:", err)
+                return nil, nil, err
+        }
+
 	dockerDone := make(chan struct{})
 
 	go func() {

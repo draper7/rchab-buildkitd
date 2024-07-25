@@ -24,7 +24,7 @@ WORKDIR /app
 COPY dockerproxy .
 RUN GOOS=linux GARCH=amd64 CGO_ENABLED=0 go build -o dockerproxy -ldflags "-X main.gitSha=$BUILD_SHA -X main.buildTime=$(date +'%Y-%m-%dT%TZ')"
 
-FROM docker:24.0.7-alpine3.19
+FROM docker:latest
 ARG BUILD_SHA
 RUN apk add bash pigz sysstat procps lsof util-linux-misc xz curl sudo libcurl e2fsprogs e2fsprogs-libs libaio libnl3 libssl3 zlib zstd-libs
 COPY etc/docker/daemon.json /etc/docker/daemon.json
@@ -36,6 +36,9 @@ COPY --from=overlaybd_build /opt/overlaybd /opt/overlaybd
 COPY --from=overlaybd_build /etc/overlaybd /etc/overlaybd
 COPY ./entrypoint ./entrypoint
 COPY ./docker-entrypoint.d/* ./docker-entrypoint.d/
+RUN mkdir -p /etc/buildkit/
+COPY ./buildkitd.toml /etc/buildkit/
+RUN cd /usr/local/ && wget https://github.com/moby/buildkit/releases/download/v0.15.0/buildkit-v0.15.0.linux-amd64.tar.gz && tar -xzvf buildkit-v0.15.0.linux-amd64.tar.gz && rm buildkit-v0.15.0.linux-amd64.tar.gz
 ENV DOCKER_TMPDIR=/data/docker/tmp
 ENTRYPOINT ["./entrypoint"]
 CMD ["./dockerproxy"]

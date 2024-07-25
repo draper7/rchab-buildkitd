@@ -1,5 +1,5 @@
-app = 'rchab'
-primary_region = 'ams'
+app = 'rchab-buildkitd'
+primary_region = 'iad'
 kill_signal = 'SIGINT'
 kill_timeout = '5s'
 
@@ -7,12 +7,12 @@ kill_timeout = '5s'
 
 [env]
   ALLOW_ORG_SLUG = 'fly'
-  DATA_DIR = '/data'
+  DATA_DIR = '/data/buildkitd'
   LOG_LEVEL = 'info'
 
 [[mounts]]
-  source = 'data'
-  destination = '/data'
+  source = 'buildkitd_data'
+  destination = '/data/buildkitd'
 
 [http_service]
   internal_port = 8080

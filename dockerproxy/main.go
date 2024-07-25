@@ -27,7 +27,7 @@ const gb = 1000 * 1000 * 1000
 
 var (
 	log             = logrus.New()
-	maxIdleDuration = 10 * time.Minute
+	maxIdleDuration = 90 * time.Minute
 	jobDeadline     = time.NewTimer(maxIdleDuration)
 	pendingRequests atomic.Uint64
 	authCache       = cache.New(5*time.Minute, 10*time.Minute)
